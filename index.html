@@ -1,145 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo List</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  
-  <style>
-    /* Adding hover effect to all buttons */
-    .task-button:hover,
-    .task-button-small:hover,
-    .task-button-delete:hover {
-      opacity: 0.8;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-    html {
-      position: relative;
-      min-height: 100%;
-    }
-
-    body {
-      margin-bottom: 60px;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 60px;
-      line-height: 60px;
-      background-color: #333;
-      color: #fff;
-    }
-  </style>
-
-</head>
-<body class="bg-gray-100">
-  <div class="header bg-black text-white py-10 text-3xl font-bold text-center">Todo List</div>
-  <div class="form-container text-center mt-10">
-    <form id="todo-form">
-      <input type="text" id="title" class="task-input border-4 border-gray-300 rounded-lg p-2 m-2 w-1/3" placeholder="Enter title here">
-      <input type="text" id="desc" class="task-input border-4 border-gray-300 rounded-lg p-2 m-2 w-1/3" placeholder="Enter description here">
-      <button type="submit" class="task-button bg-black text-white py-2 px-4 font-bold rounded-lg cursor-pointer">Add task</button>
-    </form>
-  </div>
-  <hr class="my-10">
-  <div id="task-list" class="task-list px-20"></div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const todoForm = document.getElementById('todo-form');
-      const titleInput = document.getElementById('title');
-      const descInput = document.getElementById('desc');
-      const taskList = document.getElementById('task-list');
-      let mainTask = [];
-
-      // Load tasks from local storage
-      const storedTasks = localStorage.getItem('tasks');
-      if (storedTasks) {
-        mainTask = JSON.parse(storedTasks);
-        displayTasks();
-      }
-
-      // Save tasks to local storage
-      function saveTasks() {
-        localStorage.setItem('tasks', JSON.stringify(mainTask));
-      }
-
-      // Function to display tasks
-      function displayTasks() {
-        taskList.innerHTML = '';
-        mainTask.forEach((task, index) => {
-          const taskItem = document.createElement('div');
-          taskItem.className = 'task-item flex justify-between items-center mb-10';
-          taskItem.innerHTML = `
-            <div class="task-content w-3/5">
-              <h5>${task.title}</h5>
-              <h6>${task.desc}</h6>
-            </div>
-            <div class="task-buttons">
-              <button class="task-button-small ${task.completed ? 'bg-green-500' : 'bg-red-500'} text-white py-2 px-4 rounded-lg mr-4">${task.completed ? 'Completed' : 'Mark Complete'}</button>
-              <button class="task-button-small task-button-delete bg-red-500 hover:bg-darkred-700 text-white py-2 px-4 rounded-lg">Delete</button>
-            </div>
-          `;
-          // Toggle complete
-          const completeButton = taskItem.querySelector('.task-button-small');
-          completeButton.addEventListener('click', () => {
-            toggleComplete(index);
-          });
-          // Delete task
-          const deleteButton = taskItem.querySelector('.task-button-delete');
-          deleteButton.addEventListener('click', () => {
-            deleteHandler(index);
-          });
-          taskList.appendChild(taskItem);
-          // Add <hr> tag between tasks
-          if (index < mainTask.length - 1) {
-            taskList.insertAdjacentHTML('beforeend', '<hr class="my-5">');
-          }
-        });
-      }
-
-      // Function to add task
-      function submitHandler(e) {
-        e.preventDefault();
-
-        // Check if title or description is empty
-        if (titleInput.value.trim() === '' || descInput.value.trim() === '') {
-            alert('Please fill out both fields.');
-            return;
+    <style>
+        /* Adding hover effect to all buttons */
+        .task-button-add:hover,
+        .task-button-toggle:hover {
+            opacity: 0.8;
         }
 
-        const newTask = {
-          title: titleInput.value,
-          desc: descInput.value,
-          completed: false
-        };
-        mainTask.push(newTask);
-        saveTasks();
-        displayTasks();
-        titleInput.value = '';
-        descInput.value = '';
-      }
+        .task-button-delete:hover {
+            background-color: darkred;
+            /* A dark red color */
+        }
 
-      // Function to delete task
-      function deleteHandler(index) {
-        mainTask.splice(index, 1);
-        saveTasks();
-        displayTasks();
-      }
+        html {
+            position: relative;
+            min-height: 100%;
+        }
 
-      // Function to toggle complete
-      function toggleComplete(index) {
-        mainTask[index].completed = !mainTask[index].completed;
-        saveTasks();
-        displayTasks();
-      }
+        body {
+            margin-bottom: 60px;
+        }
 
-      todoForm.addEventListener('submit', submitHandler);
-    });
-  </script>
-  <footer class="text-center py-4">Made with &#10084; by Arpan Sutradhar</footer>
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* Default styles */
+        .task-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .task-button-toggle,
+        .task-button-delete {
+            margin-bottom: 10px;
+        }
+
+        /* Media query for small screens */
+        @media screen and (max-width: 600px) {
+            .task-buttons {
+                flex-direction: column;
+                align-items: center;
+                max-width: 100px;
+            }
+
+            .task-button-toggle,
+            .task-button-delete {
+                margin: 5px 0;
+                /* Adjust margin for better spacing */
+                width: 100%;
+                /* Make buttons occupy full width */
+            }
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-100">
+    <div class="header bg-black text-white py-10 text-3xl font-bold text-center">Todo List</div>
+    <div class="form-container text-center mt-10">
+        <form id="todo-form">
+            <input type="text" id="title" class="task-input border-4 border-gray-300 rounded-lg p-2 m-2 w-1/3"
+                placeholder="Enter title here">
+            <input type="text" id="desc" class="task-input border-4 border-gray-300 rounded-lg p-2 m-2 w-1/3"
+                placeholder="Enter description here">
+            <button type="submit" class="task-button-add bg-blue-800 text-white py-2 px-4 font-bold rounded-lg cursor-pointer">
+                Add task
+            </button>
+        </form>
+    </div>
+    <hr class="my-10">
+    <div id="task-list" class="task-list px-10"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const todoForm = document.getElementById('todo-form');
+            const titleInput = document.getElementById('title');
+            const descInput = document.getElementById('desc');
+            const taskList = document.getElementById('task-list');
+            let mainTask = [];
+
+            // Load tasks from local storage
+            const storedTasks = localStorage.getItem('tasks');
+            if (storedTasks) {
+                mainTask = JSON.parse(storedTasks);
+                displayTasks();
+            }
+
+            // Save tasks to local storage
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(mainTask));
+            }
+
+            // Function to display tasks
+            function displayTasks() {
+                taskList.innerHTML = '';
+                mainTask.forEach((task, index) => {
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item flex justify-between items-center mb-2 mt-2';
+                    taskItem.innerHTML = `
+                        <div class="task-content w-3/5">
+                            <b><h5>${index + 1}. ${task.title}</h5></b>
+                            <div class="description-container" style="height: 87px; overflow: auto;">
+                                <h6>${task.desc}</h6>
+                            </div>
+                        </div>
+                        <div class="task-buttons">
+                            <button class="task-button-toggle ${task.completed ? 'bg-green-500' : 'bg-yellow-500'} text-white py-2 px-4 rounded-lg mr-4">${task.completed ? 'Completed' : 'Mark Complete'}</button>
+                            <button class="task-button-delete bg-red-500 text-white py-2 px-4 rounded-lg">Delete</button>
+                        </div>
+                    `;
+                    // Toggle complete
+                    const completeButton = taskItem.querySelector('.task-button-toggle');
+                    completeButton.addEventListener('click', () => {
+                        toggleComplete(index);
+                    });
+                    // Delete task
+                    const deleteButton = taskItem.querySelector('.task-button-delete');
+                    deleteButton.addEventListener('click', () => {
+                        deleteHandler(index);
+                    });
+                    taskList.appendChild(taskItem);
+                    // Add <hr> tag between tasks
+                    if (index < mainTask.length - 1) {
+                        taskList.insertAdjacentHTML('beforeend', '<hr class="my-1">');
+                    }
+                });
+            }
+
+            // Function to add task
+            function submitHandler(e) {
+                e.preventDefault();
+
+                // Check if title or description is empty
+                if (titleInput.value.trim() === '' || descInput.value.trim() === '') {
+                    alert('Please fill out both fields.');
+                    return;
+                }
+
+                const newTask = {
+                    title: titleInput.value,
+                    desc: descInput.value,
+                    completed: false
+                };
+                mainTask.push(newTask);
+                saveTasks();
+                displayTasks();
+                titleInput.value = '';
+                descInput.value = '';
+            }
+
+            // Function to delete task
+            function deleteHandler(index) {
+                mainTask.splice(index, 1);
+                saveTasks();
+                displayTasks();
+            }
+
+            // Function to toggle complete
+            function toggleComplete(index) {
+                mainTask[index].completed = !mainTask[index].completed;
+                saveTasks();
+                displayTasks();
+            }
+
+            todoForm.addEventListener('submit', submitHandler);
+        });
+    </script>
+    <footer class="text-center py-4">Made with &#10084; by Arpan Sutradhar</footer>
 </body>
+
 </html>
